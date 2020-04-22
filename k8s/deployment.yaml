@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jikan
+  annotations:
+    service.beta.kubernetes.io/linode-loadbalancer-throttle: "100"
+    service.beta.kubernetes.io/linode-loadbalancer-default-protocol: "http"
+  labels:
+    app: jikan
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: jikan
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jikan
+  labels:
+    app: jikan
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: jikan
+  template:
+    metadata:
+      labels:
+        app: jikan
+    spec:
+      containers:
+      - name: jikan
+        image: norin/jikan:1.0.0
+        ports:
+        - containerPort: 8080
